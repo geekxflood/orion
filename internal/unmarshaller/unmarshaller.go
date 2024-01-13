@@ -2,7 +2,6 @@ package unmarshaller
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -14,37 +13,30 @@ import (
 func UnmarshalConfig(path string, format string) (localtypes.Config, error) {
 	var conf localtypes.Config
 
+	// read the config file into a byte array
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return conf, err
 	}
 
-	if format == "yaml" {
+	// unmarshal the config file into a Config struct based on the format
+	switch format {
+	case "yaml":
 		err := yaml.Unmarshal([]byte(data), &conf)
 		if err != nil {
 			return conf, err
 		}
-	}
-
-	if format == "json" {
+	case "json":
 		err := json.Unmarshal([]byte(data), &conf)
 		if err != nil {
 			return conf, err
 		}
-	}
-
-	if format == "xml" {
-		err := xml.Unmarshal([]byte(data), &conf)
-		if err != nil {
-			return conf, err
-		}
-	}
-
-	if format == "toml" {
+	case "toml":
 		err := toml.Unmarshal([]byte(data), &conf)
 		if err != nil {
 			return conf, err
 		}
 	}
+
 	return conf, nil
 }
