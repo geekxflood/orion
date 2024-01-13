@@ -11,6 +11,7 @@ import (
 )
 
 var cfgFile string
+var insecure bool
 
 var rootCmd = &cobra.Command{
 	Use:   "orion",
@@ -41,5 +42,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "config file (default is config.yml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is config.yml)")
+	rootCmd.PersistentFlags().BoolVarP(&insecure, "insecure", "i", false, "disable TLS verification")
 }
