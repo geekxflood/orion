@@ -2,19 +2,100 @@
 
 ## Description
 
-Orion is a web server that serve targets configuration for `prometheus`.
+Orion is a web server that serves target configuration for Prometheus.
 
-## Implementation Details
+## Usage
 
-- **Language**: Go (Golang)
-- **Libraries**:
-  - Cobra for CLI and configuration management.
-  - HTTP package for the server implementation.
+You can define a local configuration file or use the default one.
+
+```bash
+orion run -config /path/to/config/file
+```
+
+Configuration format support:
+
+- **YAML**
+- **JSON**
+- **TOML**
+
+### Configuration
+
+The configuration file is a list of targets with the following format:
+
+```yaml
+module: "module_name" # Define which module Orion will have to use, refer to the modules section for more information.
+port: "9981" # Define the port on which Orion will listen. Default: 9981
+insecure: false # Define if Orion will use TLS or not. Default: false
+```
+
+#### Modules
+
+Orion supports multiple modules to retrieve targets.
+
+- **file**:
+  - This module will read a file and return its content.
+  - Use the `--local-file` flag to override the file path.
+  - If this module is used, it is expected that the configuration file is a list of `endpoints`.
+  - Example:
+
+    ```yaml
+    ---
+    module: "file"
+    port: "9981"
+    insecure: false
+    endpoints:
+      - targets:
+          - 10.0.10.2:9100
+          - 10.0.10.3:9100
+          - 10.0.10.4:9100
+          - 10.0.10.5:9100
+        labels:
+          __meta_datacenter: london
+          __meta_prometheus_job: node
+      - targets:
+          - 10.0.40.2:9100
+          - 10.0.40.3:9100
+        labels:
+          __meta_datacenter: london
+          __meta_prometheus_job: alertmanager
+    ```
+
+    ```json
+    {
+        "module": "file",
+        "port": "9981",
+        "insecure": false,
+        "targets": [
+            {
+                "targets": [
+                    "10.0.10.2:9100",
+                    "10.0.10.3:9100",
+                    "10.0.10.4:9100",
+                    "10.0.10.5:9100"
+                ],
+                "labels": {
+                    "__meta_datacenter": "london",
+                    "__meta_prometheus_job": "node"
+                }
+            },
+            {
+                "targets": [
+                    "10.0.40.2:9100",
+                    "10.0.40.3:9100"
+                ],
+                "labels": {
+                    "__meta_datacenter": "london",
+                    "__meta_prometheus_job": "alertmanager"
+                }
+            }
+        ]
+    }
+    ```
 
 ## Endpoints
 
 - **/targets**:
-  - Returns a list of targets in JSON format.
+  - Returns a list of targets in JSON format compliant with Prometheus `http_sd_configs` configuration.
   - Example:
 
     ```json
@@ -28,40 +109,3 @@ Orion is a web server that serve targets configuration for `prometheus`.
       }
     ]
     ```
-
-- **/health**:
-  - Returns a 200 OK response if the server is healthy.
-  - Returns a 500 Internal Server Error response if the server is unhealthy.
-
-- **/ready**:
-  - Returns a 200 OK response if the server is ready.
-  - Returns a 500 Internal Server Error response if the server is not ready.
-
-## Workflow
-
-### 1. Initialization
-
-- **Configuration Handling**:
-  - Utilize the Cobra library for command-line argument parsing.
-  - Load configuration through command flags or a config file.
-
-### 2. Cache Management (Go Routine 1)
-
-- **Cache Generation and Updating**:
-  - Implement a caching mechanism (in-memory or external like Redis).
-  - Initially populate the cache.
-  - Continuously update the cache based on predefined triggers or intervals.
-
-### 3. HTTP Server (Go Routine 2)
-
-- **Serving Cache Values**:
-  - Start an HTTP server after the initial cache is populated.
-  - Serve cached values over HTTP endpoints.
-  - Include readiness endpoints for Kubernetes integration.
-
-### 4. Continuous Operation
-
-- **Ongoing Cache Updates**:
-  - Ensure the first Go routine runs indefinitely.
-  - Periodically update the cache as required.
-
