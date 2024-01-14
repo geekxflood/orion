@@ -2,7 +2,13 @@
 
 ## Description
 
-Orion is a web server that serves target configuration for Prometheus.
+Orion is a web server designed to simplify target configuration for Prometheus.
+
+Prometheus offers powerful service discovery capabilities, but it can be challenging when your resources are not defined in a service discovery method supported natively by Prometheus. This often requires maintaining a static configuration file.
+
+Orion solves this problem by providing a web server that serves a list of targets in a format that Prometheus can understand, using the `http_sd_configs` configuration. With Orion, you can keep your Prometheus configuration static and let it handle the task of serving the targets to Prometheus.
+
+In addition, Orion is designed to be extensible, allowing you to define your own modules for retrieving targets.
 
 ## Usage
 
@@ -26,6 +32,7 @@ The configuration file is a list of targets with the following format:
 module: "module_name" # Define which module Orion will have to use, refer to the modules section for more information.
 port: "9981" # Define the port on which Orion will listen. Default: 9981
 insecure: false # Define if Orion will use TLS or not. Default: false
+interval: "5" # Define the interval in seconds between each refresh of the targets. Default: 5
 ```
 
 #### Modules
@@ -43,6 +50,7 @@ Orion supports multiple modules to retrieve targets.
     module: "file"
     port: "9981"
     insecure: false
+    interval: "60"
     endpoints:
       - targets:
           - 10.0.10.2:9100
@@ -65,7 +73,8 @@ Orion supports multiple modules to retrieve targets.
         "module": "file",
         "port": "9981",
         "insecure": false,
-        "targets": [
+        "interval": "60",
+        "endpoints": [
             {
                 "targets": [
                     "10.0.10.2:9100",
@@ -100,6 +109,26 @@ Orion supports multiple modules to retrieve targets.
 
     ```json
     [
+      {
+        "targets": ["localhost:8080"],
+        "labels": {
+          "job": "prometheus",
+          "instance": "localhost:8080"
+        }
+      }
+    ]
+    ```
+
+- **/config**:
+  - Returns the configuration file in JSON format.
+  - Example:
+
+  ```json
+  {
+    "module": "file",
+    "port": "9981",
+    "insecure": false,
+    "targets": [
       {
         "targets": ["localhost:8080"],
         "labels": {

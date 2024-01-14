@@ -1,4 +1,5 @@
 // main.go
+
 package main
 
 import (
@@ -6,5 +7,6 @@ import (
 )
 
 func main() {
+	// Execute the command
 	cmd.Execute()
 }

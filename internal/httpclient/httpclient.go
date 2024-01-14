@@ -3,31 +3,70 @@
 package httpclient
 
 import (
+	"log"
 	"net/http"
+	"sync/atomic"
 
 	"github.com/geekxflood/orion/internal/localtypes"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
-func RunClient(conf localtypes.Config) {
-	e := echo.New()
+// Client is a struct that holds an atomic.Value for the configuration.
+type Client struct {
+	Conf *atomic.Value
+}
 
-	// Disable TLS verification if insecure flag is set
-	if conf.Insecure {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = true
+// RunClient runs the HTTP client with the provided configuration and endpoints.
+// It sets up routes for handling HTTP requests and starts the HTTP server.
+func (client *Client) RunClient(endpoints []localtypes.Endpoints) {
+
+	// Disable Gin debug messages
+	gin.SetMode(gin.ReleaseMode)
+
+	// Create a new router with default middleware
+	r := gin.Default()
+
+	// Load the current configuration
+	currentConf := client.Conf.Load().(*localtypes.Config)
+
+	// Set up insecure client if needed
+	if currentConf.Insecure {
+		SetInsecure()
 	}
 
 	// Set up routes
-
 	// Default route returns 403 Forbidden
-	e.GET("/*", func(c echo.Context) error {
-		return c.String(http.StatusForbidden, "Forbidden")
+	r.GET("", func(c *gin.Context) {
+		c.String(http.StatusForbidden, "Forbidden")
 	})
 
-	// /targets route returns list of targets from config file
-	e.GET("/targets", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, conf.Targets)
+	// /targets route returns the list of targets
+	r.GET("/targets", func(c *gin.Context) {
+		// Load the current configuration for each request
+		conf := client.Conf.Load().(*localtypes.Config)
+		c.JSON(http.StatusOK, conf.Endpoints)
 	})
 
-	e.Logger.Fatal(e.Start(":" + conf.Port))
+	// /ready endpoint returns 200 OK
+	r.GET("/ready", func(c *gin.Context) {
+		c.String(http.StatusOK, "Ready")
+	})
+
+	// /health endpoint returns 200 OK
+	r.GET("/health", func(c *gin.Context) {
+		c.String(http.StatusOK, "OK")
+	})
+
+	// /config route returns config file contents
+	r.GET("/config", func(c *gin.Context) {
+		// Load the current configuration for each request
+		conf := client.Conf.Load().(*localtypes.Config)
+		c.JSON(http.StatusOK, conf)
+	})
+
+	// Start the HTTP server
+	r.Run(":" + currentConf.Port)
+
+	log.Println("Application available at http://localhost:" + currentConf.Port + "/")
+
 }
