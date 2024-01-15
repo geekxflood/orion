@@ -84,9 +84,11 @@ var runCmd = &cobra.Command{
 			log.Println("GLPI module is enabled")
 
 			// run the glpi module and store the targets in initialConf.Targets
-			err := module_glpi.GetGLPI()
+			// The GetGLPI function returns a string and an error
+			// It takes as input a pointer to the configuration
+			_, err := module_glpi.GetGLPI()
 			if err != nil {
-				log.Fatalf("Error getting targets from GLPI: %s", err)
+				log.Fatalf("Error getting GLPI data: %s", err)
 			}
 
 			// Run the http client

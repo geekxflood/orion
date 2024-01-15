@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/base64"
 	"errors"
 	"log"
 	"os"
@@ -71,4 +72,10 @@ func LookupConfig(file string) (string, string, error) {
 	}
 
 	return "", "", errors.New("no config file found")
+}
+
+// EncodeBase64 encodes a string to Base64.
+func EncodeBase64(str string) string {
+	encoded := base64.StdEncoding.EncodeToString([]byte(str))
+	return encoded
 }

@@ -2,35 +2,92 @@
 
 package module_glpi
 
-func GetGLPI() error {
+import (
+	"net/http"
+	"sync/atomic"
 
-	// Full doc: https://github.com/ramylson/glpi/blob/master/glpi/apirest.md
+	"github.com/geekxflood/orion/internal/helpers"
+	"github.com/geekxflood/orion/internal/httpclient"
+	"github.com/geekxflood/orion/internal/localtypes"
+)
 
-	// Init session for getting session token
-	/*
+// Client is a struct that holds an atomic.Value for the configuration.
+type Client struct {
+	Conf *atomic.Value
+}
 
-		URL: apirest.php/initSession/
+// Full doc: https://github.com/ramylson/glpi/blob/master/glpi/apirest.md
 
-		Description: Request a session token to uses other api endpoints.
+// GetGLPI retrieves GLPI data.
+func GetGLPI() (string, error) {
 
-		Method: GET
+	var client Client
 
-		Parameters: (Headers)
+	// Load the current configuration
+	currentConf := client.Conf.Load().(*localtypes.Config)
 
-		App-Token: authorization string provided by the GLPI api configuration. Optional.
+	// Get session token
+	_, err := GetSessionToken(currentConf)
+	if err != nil {
+		return "", err
+	}
 
-		a couple login & password: 2 parameters to login with user authentication. You should pass this 2 parameters in http basic auth. It consists in a Base64 string with login and password separated by ":" A valid Authorization header is: * "Authorization: Basic base64({login}:{password})"
+	return "", nil
+}
 
-		OR
+// GetSessionToken retrieves the session token.
+func GetSessionToken(currentConf *localtypes.Config) (string, error) {
+	// Set the headers for the request
+	req, err := http.NewRequest("GET", currentConf.GlpiConfig.Url+"apirest.php/initSession/", nil)
+	if err != nil {
+		return "", err
+	}
 
-		an user_token defined in User Preference (See 'Remote access key') You should pass this parameter in 'Authorization' HTTP header. A valid Authorization header is: * "Authorization: user_token q56hqkniwot8wntb3z1qarka5atf365taaa2uyjrn"
+	encodedAuth := helpers.EncodeBase64(currentConf.GlpiConfig.Username + ":" + currentConf.GlpiConfig.Password)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("App-Token", currentConf.GlpiConfig.ApiKey)
+	req.Header.Set("Authorization", encodedAuth)
 
-		Returns:
+	// Make the request
+	resp, err := httpclient.NewRequest(req)
+	if err != nil {
+		return "", err
+	}
 
-		200 (OK) with the session_token string.
-		400 (Bad Request) with a message indicating an error in input parameter.
-		401 (UNAUTHORIZED)
-	*/
+	return resp, nil
+}
 
-	return nil
+/*
+Get an item
+URL: apirest.php/:itemtype/:id
+Description: Return the instance fields of itemtype identified by id.
+Method: GET
+Parameters: (Headers)
+Session-Token: session var provided by initSession endpoint. Mandatory.
+App-Token: authorization string provided by the GLPI api configuration. Optional.
+Parameters: (query string)
+id: unique identifier of the itemtype. Mandatory.
+expand_dropdowns (default: false): show dropdown name instead of id. Optional.
+get_hateoas (default: true): Show relations of the item in a links attribute. Optional.
+get_sha1 (default: false): Get a sha1 signature instead of the full answer. Optional.
+with_devices: Only for [Computer, NetworkEquipment, Peripheral, Phone, Printer], retrieve the associated components. Optional.
+with_disks: Only for Computer, retrieve the associated file-systems. Optional.
+with_softwares: Only for Computer, retrieve the associated software's installations. Optional.
+with_connections: Only for Computer, retrieve the associated direct connections (like peripherals and printers) .Optional.
+with_networkports: Retrieve all network's connections and advanced network's informations. Optional.
+with_infocoms: Retrieve financial and administrative informations. Optional.
+with_contracts: Retrieve associated contracts. Optional.
+with_documents: Retrieve associated external documents. Optional.
+with_tickets: Retrieve associated itil tickets. Optional.
+with_problems: Retrieve associated itil problems. Optional.
+with_changes: Retrieve associated itil changes. Optional.
+with_notes: Retrieve Notes. Optional.
+with_logs: Retrieve historical. Optional.
+Returns:
+200 (OK) with item data (Last-Modified header should contain the date of last modification of the item).
+401 (UNAUTHORIZED).
+404 (NOT FOUND).
+*/
+func GetItem() {
+
 }
