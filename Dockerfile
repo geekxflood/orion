@@ -13,7 +13,7 @@ ENV CGO_ENABLED=0
 WORKDIR /go/src/
 COPY . .
 RUN apk update && apk add make git
-RUN go build -a -gcflags=all="-l -B" -ldflags="-w -s" -o build/orion ./...
+RUN go build -a -gcflags=all="-l -B" -ldflags="-w -s" -o build/orion .
 
 # Second stage
 FROM alpine:3.19

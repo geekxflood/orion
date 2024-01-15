@@ -41,6 +41,16 @@ Configuration format support:
 - **JSON**
 - **TOML**
 
+**Docker**:
+
+You can run it with Docker:
+
+```bash
+docker run -d -p 9981:9981 -v /path/to/config/file:/config.yaml ghcr.io/leboncoin/orion:latest
+```
+
+![](assets/runOCI.gif)
+
 ### Configuration
 
 The configuration file is a list of targets with the following format:
