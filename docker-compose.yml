@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  orion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: orion
+    image: orion:latest
+    ports:
+      - "9981:9981"
+    volumes:
+      - $PWD/config:/config
+    command: /usr/local/bin/orion run --config /config/config.yaml
