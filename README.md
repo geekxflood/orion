@@ -8,7 +8,7 @@ Prometheus offers powerful service discovery capabilities, but it can be challen
 
 Orion solves this problem by providing a web server that serves a list of targets in a format that Prometheus can understand, using the `http_sd_configs` configuration. With Orion, you can keep your Prometheus configuration static and let it handle the task of serving the targets to Prometheus.
 
-In addition, Orion is designed to be extensible, allowing you to define your own modules for retrieving targets.
+In addition, Orion is designed to be extensible, allowing you to define your modules for retrieving targets.
 
 ## Usage
 
@@ -138,3 +138,104 @@ Orion supports multiple modules to retrieve targets.
       }
     ]
     ```
+
+
+## Service discovery
+
+Prometheus can discover new targets using service discovery (`sd`). Service discovery allows Prometheus to automatically find and monitor new targets without manual configuration.
+
+There are various service discovery methods supported by Prometheus, including DNS queries, values files, proprietary software (Consul, Puppet, Eureka, etc.), and dedicated cloud/infrastructure providers (AWS, GCE, etc.). One interesting provider is `http_sd`, which allows Prometheus to fetch targets from a specified URL.
+
+For example, the `http_sd` configuration can include the following options:
+This is the extract from the doc:
+
+```yaml
+# URL from which the targets are fetched.
+url: <string>
+
+# Refresh interval to re-query the endpoint.
+[ refresh_interval: <duration> | default = 60s ]
+
+# Authentication information used to authenticate to the API server.
+# Note that `basic_auth`, `authorization` and `oauth2` options are
+# mutually exclusive.
+# `password` and `password_file` are mutually exclusive.
+
+# Optional HTTP basic authentication information.
+basic_auth:
+  [ username: <string> ]
+  [ password: <secret> ]
+  [ password_file: <string> ]
+
+# Optional `Authorization` header configuration.
+authorization:
+  # Sets the authentication type.
+  [ type: <string> | default: Bearer ]
+  # Sets the credentials. It is mutually exclusive with
+  # `credentials_file`.
+  [ credentials: <secret> ]
+  # Sets the credentials to the credentials read from the configured file.
+  # It is mutually exclusive with `credentials`.
+  [ credentials_file: <filename> ]
+
+# Optional OAuth 2.0 configuration.
+oauth2:
+  [ <oauth2> ]
+
+# Optional proxy URL.
+[ proxy_url: <string> ]
+# Comma-separated string that can contain IPs, CIDR notation, domain names
+# that should be excluded from proxying. IP and domain names can
+# contain port numbers.
+[ no_proxy: <string> ]
+# Use proxy URL indicated by environment variables (HTTP_PROXY, https_proxy, HTTPs_PROXY, https_proxy, and no_proxy)
+[ proxy_from_environment: <boolean> | default: false ]
+# Specifies headers to send to proxies during CONNECT requests.
+[ proxy_connect_header:
+  [ <string>: [<secret>, ...] ] ]
+
+# Configure whether HTTP requests follow HTTP 3xx redirects.
+[ follow_redirects: <boolean> | default = true ]
+
+# Whether to enable HTTP2.
+[ enable_http2: <boolean> | default: true ]
+
+# TLS configuration.
+tls_config:
+  [ <tls_config> ]
+```
+
+## Project objectives
+
+This project aims to build a fast and reliable `http_sd_configs` provider endpoint for Prometheus.
+
+This provider will cache and refresh its data at regular intervals. It must be highly available and allow for node deficiency in a multiple-instance deployment.
+
+Example of a sequence diagram big picture:
+
+```mermaid
+sequenceDiagram
+    participant prometheus
+    participant orion
+    participant snmp-exporter
+    participant modbus-exporter
+    participant targetA
+    participant targetB
+    loop Every X seconds
+        prometheus->>orion: GET /targets
+        orion->>prometheus: response: tragets:[targetA{method:snmp},TargetB{method:modbus}]
+        critical Failed to GET /targets
+            prometheus->>prometheus: reuse same target values
+        end
+    end
+    Note over prometheus,snmp-exporter: prometheus relabelling target: targetA.method = SNMP then snmp-exporter
+    prometheus->>snmp-exporter: GET /snmp?mibs?targetA
+    snmp-exporter->>targetA: SNMPwalk
+    targetA->>snmp-exporter: response
+    snmp-exporter->>prometheus: /metrics for targetA with SNMP
+    Note over prometheus,modbus-exporter: prometheus relabelling target: targetA.method = modbus then modbus-exporter
+    prometheus->>modbus-exporter: Get /modbus?targetB?register=X
+    modbus-exporter->>targetB: modbus command on register X
+    targetB->>modbus-exporter: response
+    modbus-exporter->>prometheus: response: /metrics for targetB with modbus
+```
