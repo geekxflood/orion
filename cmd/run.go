@@ -10,6 +10,8 @@ import (
 	"github.com/geekxflood/orion/internal/helpers"
 	"github.com/geekxflood/orion/internal/httpclient"
 	"github.com/geekxflood/orion/internal/localtypes"
+	module_glpi "github.com/geekxflood/orion/internal/modules/glpi"
+	module_phpipam "github.com/geekxflood/orion/internal/modules/phpipam"
 	"github.com/spf13/cobra"
 )
 
@@ -74,6 +76,25 @@ var runCmd = &cobra.Command{
 			if initialConf.Endpoints == nil {
 				initialConf.Endpoints = []localtypes.Endpoints{}
 			}
+
+			// Run the http client
+			httpClient.RunClient(initialConf.Endpoints)
+
+		case "glpi":
+			log.Println("GLPI module is enabled")
+
+			// run the glpi module
+			module_glpi.GetGLPI()
+
+			// Run the http client
+			httpClient.RunClient(initialConf.Endpoints)
+
+
+		case "phpipam":
+			log.Println("phpipam module is enabled")
+
+			// run the phpipam module
+			module_phpipam.GetphpIPAM()
 
 			// Run the http client
 			httpClient.RunClient(initialConf.Endpoints)

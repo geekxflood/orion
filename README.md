@@ -101,6 +101,80 @@ Orion supports multiple modules to retrieve targets.
     }
     ```
 
+- **GLPI**:
+  - This module will retrieve targets from a GLPI instance.
+  - If this module is used, it is expected the `glpi_conf` to be set.
+  - Example
+
+    ```yaml
+    ---
+    module: "glpi"
+    port: "9981"
+    insecure: false
+    interval: "60"
+    glpi_conf:
+      address: "https://glpi.example.com"
+      username: "admin"
+      password: "admin"
+      token: ""
+      timeout: "10"
+      filter: ""
+    ```
+
+    ```json
+    {
+      "module": "glpi",
+      "port": "9981",
+      "insecure": false,
+      "interval": "60",
+      "glpi_conf": {
+        "address": "https://glpi.example.com",
+        "username": "admin",
+        "password": "admin",
+        "token": "",
+        "timeout": "10",
+        "filter": ""
+      }
+    }
+    ```
+
+- **phpIPAM**
+  - This module will retrieve targets from a phpIPAM instance.
+  - If this module is used, it is expected the `phpipam_conf` to be set.
+  - Example:
+
+    ```yaml
+    ---
+    module: "phpipam"
+    port: "9981"
+    insecure: false
+    interval: "60"
+    phpipam_conf:
+      address: "https://phpipam.example.com"
+      username: "admin"
+      password: "admin"
+      token: ""
+      timeout: "10"
+      filter: ""
+    ```
+
+    ```json
+    {
+      "module": "phpipam",
+      "port": "9981",
+      "insecure": false,
+      "interval": "60",
+      "phpipam_conf": {
+        "address": "https://phpipam.example.com",
+        "username": "admin",
+        "password": "admin",
+        "token": "",
+        "timeout": "10",
+        "filter": ""
+      }
+    }
+    ```
+
 ## Endpoints
 
 - **/targets**:
@@ -138,7 +212,6 @@ Orion supports multiple modules to retrieve targets.
       }
     ]
     ```
-
 
 ## Service discovery
 
