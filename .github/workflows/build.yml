@@ -1,0 +1,53 @@
+name: Go Build and Publish
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to main branch
+  pull_request:
+    branches:
+      - main # Trigger on pull request to main branch
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest # The type of runner that the job will run on
+    strategy:
+      matrix:
+        go-version: [1.21] # Set Go version
+        os: [ubuntu-latest, macos-latest, windows-latest] # Operating systems
+        arch: [amd64, arm64] # Architectures
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          env GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o orion-${{ matrix.os }}-${{ matrix.arch }} ./...
+          # Builds your Go project for each OS and architecture in the matrix
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: orion-${{ matrix.os }}-${{ matrix.arch }}
+          path: orion-${{ matrix.os }}-${{ matrix.arch }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # Only run on main branch
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Publish Package
+        run: |
+          # Add your publish commands here
+          # Example: Publishing to a repository or storage
+          # Replace with your actual publish commands
+          echo "Publishing orion-${{ matrix.os }}-${{ matrix.arch }}..."
