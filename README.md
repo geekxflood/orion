@@ -49,7 +49,7 @@ You can run it with Docker:
 docker run -d -p 9981:9981 -v /path/to/config/file:/config.yaml ghcr.io/leboncoin/orion:latest
 ```
 
-!(assets/buildoci.gif)
+![](assets/buildoci.gif)
 
 ### Configuration
 
