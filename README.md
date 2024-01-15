@@ -10,6 +10,23 @@ Orion solves this problem by providing a web server that serves a list of target
 
 In addition, Orion is designed to be extensible, allowing you to define your modules for retrieving targets.
 
+## TODO
+
+In no particular order:
+
+- [ ] Add a module for retrieving targets from a GLPI instance
+- [ ] Add a module for retrieving targets from a phpIPAM instance
+- [ ] Add a module for retrieving targets from a Netbox instance
+- [ ] Add a module for retrieving targets from a Consul instance
+- [ ] Add a customizable module for retrieving targets from a not-supported remote source
+- [x] Add a module for retrieving targets from a local file
+- [ ] Enable remote cache usage (Redis, Memcached, etc.)
+- [ ] Use __meta_ labels to add more information to the targets and allow relabelling from serving the /targets
+- [ ] Improve the documentation
+- [ ] Add tests
+- [ ] Generate and publish OCI images
+- [ ] Generate and publish a helm chart
+
 ## Usage
 
 You can define a local configuration file or use the default one.
@@ -291,9 +308,7 @@ sequenceDiagram
     participant prometheus
     participant orion
     participant snmp-exporter
-    participant modbus-exporter
     participant targetA
-    participant targetB
     loop Every X seconds
         prometheus->>orion: GET /targets
         orion->>prometheus: response: tragets:[targetA{method:snmp},TargetB{method:modbus}]
@@ -306,9 +321,4 @@ sequenceDiagram
     snmp-exporter->>targetA: SNMPwalk
     targetA->>snmp-exporter: response
     snmp-exporter->>prometheus: /metrics for targetA with SNMP
-    Note over prometheus,modbus-exporter: prometheus relabelling target: targetA.method = modbus then modbus-exporter
-    prometheus->>modbus-exporter: Get /modbus?targetB?register=X
-    modbus-exporter->>targetB: modbus command on register X
-    targetB->>modbus-exporter: response
-    modbus-exporter->>prometheus: response: /metrics for targetB with modbus
 ```
