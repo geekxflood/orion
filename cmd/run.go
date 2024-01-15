@@ -83,12 +83,14 @@ var runCmd = &cobra.Command{
 		case "glpi":
 			log.Println("GLPI module is enabled")
 
-			// run the glpi module
-			module_glpi.GetGLPI()
+			// run the glpi module and store the targets in initialConf.Targets
+			err := module_glpi.GetGLPI()
+			if err != nil {
+				log.Fatalf("Error getting targets from GLPI: %s", err)
+			}
 
 			// Run the http client
 			httpClient.RunClient(initialConf.Endpoints)
-
 
 		case "phpipam":
 			log.Println("phpipam module is enabled")
