@@ -50,7 +50,7 @@ Configuration format support:
 You can run it with Docker:
 
 ```bash
-docker run -d -p 9981:9981 -v /path/to/config/file:/config.yaml ghcr.io/leboncoin/orion:latest
+docker run -d -p 9981:9981 -v /path/to/config/file:/config.yaml ghcr.io/leboncoin/orion:latest /usr/local/bin/orion run --config /config/config.yaml
 ```
 
 ![](assets/buildoci.gif)
@@ -132,78 +132,30 @@ Orion supports multiple modules to retrieve targets.
     }
     ```
 
-- **GLPI**:
-  - This module will retrieve targets from a GLPI instance.
-  - If this module is used, it is expected the `glpi_conf` to be set.
-  - Example
-
-    ```yaml
-    ---
-    module: "glpi"
-    port: "9981"
-    insecure: false
-    interval: "60"
-    glpi_conf:
-      address: "https://glpi.example.com"
-      username: "admin"
-      password: "admin"
-      token: ""
-      timeout: "10"
-      filter: ""
-    ```
-
-    ```json
-    {
-      "module": "glpi",
-      "port": "9981",
-      "insecure": false,
-      "interval": "60",
-      "glpi_conf": {
-        "address": "https://glpi.example.com",
-        "username": "admin",
-        "password": "admin",
-        "token": "",
-        "timeout": "10",
-        "filter": ""
-      }
-    }
-    ```
-
-- **phpIPAM**
-  - This module will retrieve targets from a phpIPAM instance.
-  - If this module is used, it is expected the `phpipam_conf` to be set.
+- **http**:
+  - This module will perform an HTTP request to a remote endpoint and return its content.
+  - Use the key `auth` to define the authentication method.
   - Example:
 
     ```yaml
     ---
-    module: "phpipam"
+    module: "http"
     port: "9981"
     insecure: false
     interval: "60"
-    phpipam_conf:
-      address: "https://phpipam.example.com"
-      username: "admin"
-      password: "admin"
-      token: ""
-      timeout: "10"
-      filter: ""
-    ```
-
-    ```json
-    {
-      "module": "phpipam",
-      "port": "9981",
-      "insecure": false,
-      "interval": "60",
-      "phpipam_conf": {
-        "address": "https://phpipam.example.com",
-        "username": "admin",
-        "password": "admin",
-        "token": "",
-        "timeout": "10",
-        "filter": ""
-      }
-    }
+    module_http:
+      auth:
+        type: "basic"
+        username: "admin"
+        password: "admin" # If their is not endpoint define, assume to build the auth header
+        endpoint: "http://localhost:8080/auth" # If and endpoint auth define, retrieve a token. You will also need to define an handling of TTL for a token
+      endpoint: "http://localhost:8080/data"
+        data_type: "json"
+        mapping:
+          - targets:
+              - "key_in_filter_1" # What is the key where I can find the target value
+            labels: 
+              - label_name_1" : "key_in_filter_1" # label_name_1 define the label name in the prometheus config, key_in_filter_1 define the key where I can find the value
     ```
 
 ## Endpoints
