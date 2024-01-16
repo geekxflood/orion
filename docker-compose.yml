@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: orion
-    image: orion:latest
+    image: orion:dev
     ports:
       - "9981:9981"
     volumes:
