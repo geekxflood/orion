@@ -1,3 +1,7 @@
+<p align="center">
+    <img width=30% src="assets/logo.png">
+</p>
+
 # Orion
 
 ## Description
