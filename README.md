@@ -18,10 +18,6 @@ In addition, Orion is designed to be extensible, allowing you to define your mod
 
 In no particular order:
 
-- [ ] Add a module for retrieving targets from a GLPI instance
-- [ ] Add a module for retrieving targets from a phpIPAM instance
-- [ ] Add a module for retrieving targets from a Netbox instance
-- [ ] Add a module for retrieving targets from a Consul instance
 - [ ] Add a customizable module for retrieving targets from a not-supported remote source
 - [x] Add a module for retrieving targets from a local file
 - [ ] Enable remote cache usage (Redis, Memcached, etc.)
