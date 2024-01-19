@@ -71,7 +71,7 @@ Orion supports multiple modules to retrieve targets.
   - Use the `--local-file` flag to override the file path.
   - If this module is used, it is expected that the configuration file is a list of `endpoints`.
   - Example:
-
+  
     ```yaml
     ---
     module: "file"
@@ -138,20 +138,67 @@ Orion supports multiple modules to retrieve targets.
     module: "http"
     port: "9981"
     insecure: false
-    interval: "60"
+    interval: "60s"
+    timeout: "30s" # Timeout for HTTP requests
+    rate_limit: 10 # Requests per minute
+    retry:
+      attempts: 3
+      backoff: "5s"
+
+    logging:
+      level: "info" # Options: debug, info, warn, error
+      format: "json" # Options: json, plain
+      output: "file" # Options: file, stdout
+      file_path: "/var/log/myapp.log"
+
+    cache:
+      enabled: true
+      duration: "10m" # Cache duration
+      max_size: 100 # Maximum number of items in cache
+
+    health_check:
+      endpoint: "/health"
+      interval: "30s"
+
+    metrics:
+      prometheus_enabled: true
+      custom_metrics_enabled: true
+      custom_metrics:
+        - name: "my_custom_metric"
+          type: "gauge" # Options: gauge, counter, histogram, summary
+
     module_http:
       auth:
-        type: "basic"
-        username: "admin"
-        password: "admin" # If their is not endpoint define, assume to build the auth header
-        endpoint: "http://localhost:8080/auth" # If and endpoint auth define, retrieve a token. You will also need to define an handling of TTL for a token
+        type: "basic" # Options: basic, token, oauth
+        username: "${HTTP_AUTH_USERNAME}"
+        password: "${HTTP_AUTH_PASSWORD}"
+        token_url: "http://localhost:8080/auth"
+        token_ttl: "1h"
       endpoint: "http://localhost:8080/data"
-        data_type: "json"
-        mapping:
-          - targets:
-              - "key_in_filter_1" # What is the key where I can find the target value
-            labels: 
-              - label_name_1" : "key_in_filter_1" # label_name_1 define the label name in the prometheus config, key_in_filter_1 define the key where I can find the value
+      data_type: "json"
+      mapping:
+        - targets:
+            - "key_in_target"
+          labels: 
+            - label_name_1: "key_in_filter_1"
+
+    high_availability:
+      load_balancing_method: "round_robin" # Options: round_robin, least_connections
+      failover_strategy: "next_available" # Options: next_available, random
+
+    security:
+      tls_config:
+        cert_file: "/path/to/cert.pem"
+        key_file: "/path/to/key.pem"
+        ca_cert_file: "/path/to/ca.pem"
+
+    dynamic_config:
+      reload_enabled: true
+      reload_interval: "5m"
+
+    internationalization:
+      default_locale: "en_US"
+      supported_locales: ["en_US", "fr_FR", "es_ES"]
     ```
 
 ## Endpoints
@@ -265,22 +312,168 @@ This provider will cache and refresh its data at regular intervals. It must be h
 
 Example of a sequence diagram big picture:
 
+**File Module**
+
 ```mermaid
 sequenceDiagram
     participant prometheus
     participant orion
-    participant snmp-exporter
+    participant exporterA
     participant targetA
     loop Every X seconds
         prometheus->>orion: GET /targets
-        orion->>prometheus: response: tragets:[targetA{method:snmp},TargetB{method:modbus}]
+        orion->>prometheus: response: tragets:[targetA[{}]]
         critical Failed to GET /targets
             prometheus->>prometheus: reuse same target values
         end
     end
-    Note over prometheus,snmp-exporter: prometheus relabelling target: targetA.method = SNMP then snmp-exporter
-    prometheus->>snmp-exporter: GET /snmp?mibs?targetA
-    snmp-exporter->>targetA: SNMPwalk
-    targetA->>snmp-exporter: response
-    snmp-exporter->>prometheus: /metrics for targetA with SNMP
+    Note over prometheus,exporterA: prometheus relabelling target
+    prometheus->>exporterA: GET /metrics?targetA
+    exporterA->>targetA: exporter query targetA
+    targetA->>exporterA: response
+    exporterA->>prometheus: /metrics for targetA
+    
+```
+
+**HTTP Module**
+
+```mermaid
+sequenceDiagram
+    participant sourceB
+    participant orion
+    participant prometheus
+    participant exporterB
+    participant targetB
+    loop Every X seconds
+      orion->>sourceB: GET /data
+      sourceB->>orion: response: data
+      critical Failed to GET /data
+          Note over orion: retry and backoff and meanwhile serve cached data
+          orion->>sourceB: GET /data
+      end
+      orion->>orion: cache data
+    end
+    loop Every X seconds
+        prometheus->>orion: GET /targets
+        orion->>prometheus: response: tragets:[targetB[{}]]
+        critical Failed to GET /targets
+            prometheus->>prometheus: reuse same target values
+        end
+    end
+    Note over prometheus,exporterB: prometheus relabelling target
+    prometheus->>exporterB: GET /metrics?targetB
+    exporterB->>targetB: exporter query targetB
+    targetB->>exporterB: response
+    exporterB->>prometheus: /metrics for targetB
+```
+
+## Improvement
+
+### http_module
+
+- Extend the configuration to support this wide array of features:
+
+```yaml
+---
+module: "http"
+port: "9981"
+insecure: false # Define if Orion will use TLS or not. Default: false
+interval: "60s" # Define the interval in seconds between each refresh of the targets. Default: 5
+timeout: "30s" # Timeout for HTTP requests
+rate_limit: 10 # Requests per minute
+
+# Retry configuration (optional)
+retry:
+  attempts: 3
+  backoff: "5s"
+
+# Logging configuration (optional)
+logging:
+  level: "info" # Options: debug, info, warn, error
+  format: "json" # Options: json, plain
+  output: "file" # Options: file, stdout
+  file_path: "/var/log/myapp.log"
+
+# Cache configuration (optional)
+cache:
+  enabled: true
+  duration: "10m" # Cache duration
+  max_size: 100 # Maximum number of items in cache
+
+# Health check configuration (optional)
+health_check:
+  endpoint: "/health"
+  interval: "30s"
+
+# Prometheus metrics configuration (optional)
+metrics:
+  prometheus_enabled: true
+  custom_metrics_enabled: true
+  custom_metrics:
+    - name: "my_custom_metric"
+      type: "gauge" # Options: gauge, counter, histogram, summary
+
+# HTTP module configuration (required)
+module_http:
+
+  # Authentication configuration (optional)
+  auth:
+    type: "${HTTP_AUTH_TYPE}" # Placeholder for auth type: basic, token, oauth, none
+    credentials:
+      username: "${HTTP_AUTH_USERNAME}"
+      password: "${HTTP_AUTH_PASSWORD}"
+    token:
+      url: "${HTTP_AUTH_TOKEN_URL}" # URL to retrieve the token
+      request_method: "POST" # HTTP method for token retrieval: GET, POST
+      request_body: "${HTTP_AUTH_TOKEN_REQUEST_BODY}" # JSON, form-encoded data, etc.
+      headers: # Additional headers for token request
+        Content-Type: "application/json"
+      ttl: "1h" # Time-to-live for token
+    oauth:
+      client_id: "${OAUTH_CLIENT_ID}"
+      client_secret: "${OAUTH_CLIENT_SECRET}"
+      auth_url: "${OAUTH_AUTH_URL}"
+      scopes: ["scope1", "scope2"] # OAuth scopes
+  
+  # Endpoint configuration (required)
+  request:
+    method: "GET" # HTTP method: GET, POST, PUT, DELETE
+    url: "http://localhost:8080/data"
+    headers: # Custom headers for the data request
+      Accept: "application/json"
+    params: # Query parameters for the data request
+      param1: "value1"
+      param2: "value2"
+    timeout: "30s" # Timeout for the data request
+  data_type: "json" # Expected data type: json, xml, text
+  data_mapping:
+    json_path: "data.targets" # JSONPath or XMLPath to locate the desired data
+    mappings: # Mapping of data to Prometheus format
+      - targets:
+          - json_path: "ip_address"
+        labels: 
+          label_name_1: "json_path: label_value_1"
+          label_name_2: "json_path: label_value_2"
+
+# High availability configuration (optional)
+high_availability:
+  load_balancing_method: "round_robin" # Options: round_robin, least_connections
+  failover_strategy: "next_available" # Options: next_available, random
+
+# TLS configuration (optional)
+security:
+  tls_config:
+    cert_file: "/path/to/cert.pem"
+    key_file: "/path/to/key.pem"
+    ca_cert_file: "/path/to/ca.pem"
+
+# Dynamic configuration for the HTTP module (optional)
+dynamic_config:
+  reload_enabled: true
+  reload_interval: "5m"
+
+# Internationalization configuration for the HTTP module (optional)
+internationalization: 
+  default_locale: "en_US"
+  supported_locales: ["en_US", "fr_FR", "es_ES"]
 ```
