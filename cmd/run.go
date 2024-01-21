@@ -10,8 +10,6 @@ import (
 	"github.com/geekxflood/orion/internal/helpers"
 	"github.com/geekxflood/orion/internal/httpclient"
 	"github.com/geekxflood/orion/internal/localtypes"
-	module_glpi "github.com/geekxflood/orion/internal/modules/glpi"
-	module_phpipam "github.com/geekxflood/orion/internal/modules/phpipam"
 	"github.com/spf13/cobra"
 )
 
@@ -80,28 +78,8 @@ var runCmd = &cobra.Command{
 			// Run the http client
 			httpClient.RunClient(initialConf.Endpoints)
 
-		case "glpi":
-			log.Println("GLPI module is enabled")
-
-			// run the glpi module and store the targets in initialConf.Targets
-			// The GetGLPI function returns a string and an error
-			// It takes as input a pointer to the configuration
-			_, err := module_glpi.GetGLPI()
-			if err != nil {
-				log.Fatalf("Error getting GLPI data: %s", err)
-			}
-
-			// Run the http client
-			httpClient.RunClient(initialConf.Endpoints)
-
-		case "phpipam":
-			log.Println("phpipam module is enabled")
-
-			// run the phpipam module
-			module_phpipam.GetphpIPAM()
-
-			// Run the http client
-			httpClient.RunClient(initialConf.Endpoints)
+		case "http":
+			log.Println("HTTP module is enabled")
 
 		default:
 			log.Fatalln("No modules defined")
