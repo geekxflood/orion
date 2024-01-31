@@ -88,7 +88,15 @@ targets:
     endpoint: "http://example.com/soap"
     // ... other SOAP-specific configs ...
 
-  // ... other targets ...
+  - type: "GraphQL"
+    url: "http://example.com/graphql"
+    query: "query { ... }"
+    // ... other GraphQL-specific configs ...
+
+  - type: "SQL"
+    connection_string: "user:password@tcp(localhost:3306)/database"
+    query: "SELECT * FROM users"
+    // ... other SQL-specific configs ...
 ```
 
 Each target can have protocol-specific parameters such as URLs for REST, file paths for file-based scraping, and endpoints for SOAP. Additionally, common parameters like response type and parsing rules can be specified.
