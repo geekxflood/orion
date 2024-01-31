@@ -35,26 +35,25 @@ flowchart LR
     J --> K[Aggregate Results]
     K --> L[End]
 ```
+### Data Query Interface and Implementations
 
-### Data Query Interface
+#### Interface: `DataQuery`
+The `DataQuery` interface is essential to the system, defining the standard operations that all data querying modules must implement.
 
-All modules implement the following interface:
+- **Methods:**
+  - `Initialize(config TargetConfig) error`: Initializes the query module with the provided configuration.
+  - `MakeRequest() (*ResponseData, error)`: Executes the data query and retrieves the raw response.
+  - `ParseResponse(rawResponse interface{}) (ParsedData, error)`: Parses the raw response into a structured format.
 
-```mermaid
-classDiagram
-    class DataQuery {
-        +Initialize(config TargetConfig) error
-        +MakeRequest() (*ResponseData, error)
-        +ParseResponse(rawResponse interface{}) (ParsedData, error)
-    }
+#### Implementations
+The `DataQuery` interface is implemented by several modules, each tailored to handle a specific data querying protocol or format.
 
-    DataQuery <|.. RESTQuery : implements
-    DataQuery <|.. SOAPQuery : implements
-    DataQuery <|.. GraphQLQuery : implements
-    DataQuery <|.. SQLQuery : implements
-    DataQuery <|.. GRPCQuery : implements
-    DataQuery <|.. FileQuery : implements
-```
+- **RESTQuery**: Handles REST API requests.
+- **SOAPQuery**: Deals with SOAP protocol requests.
+- **GraphQLQuery**: Manages queries to GraphQL endpoints.
+- **SQLQuery**: Executes SQL queries against databases.
+- **GRPCQuery**: Handles gRPC calls.
+- **FileQuery**: Reads and parses data from local files.
 
 ## Configuration
 
