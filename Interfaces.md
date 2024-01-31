@@ -41,12 +41,13 @@ flowchart LR
 All modules implement the following interface:
 
 ```mermaid
+```mermaid
 classDiagram
     class DataQuery {
-      <<interface>>
-      +Initialize(config TargetConfig) error
-      +MakeRequest() (*ResponseData, error)
-      +ParseResponse(rawResponse interface{}) (ParsedData, error)
+        <<interface>>
+        +Initialize(config TargetConfig) error
+        +MakeRequest() (*ResponseData, error)
+        +ParseResponse(rawResponse interface{}) (ParsedData, error)
     }
 
     DataQuery <|-- RESTQuery
@@ -55,6 +56,7 @@ classDiagram
     DataQuery <|-- SQLQuery
     DataQuery <|-- GRPCQuery
     DataQuery <|-- FileQuery
+
 ```
 
 ## Configuration
