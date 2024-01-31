@@ -22,4 +22,5 @@ go.work
 
 .vscode
 .env
+.zed
 .DS_Store
