@@ -41,22 +41,19 @@ flowchart LR
 All modules implement the following interface:
 
 ```mermaid
-```mermaid
 classDiagram
     class DataQuery {
-        <<interface>>
         +Initialize(config TargetConfig) error
         +MakeRequest() (*ResponseData, error)
         +ParseResponse(rawResponse interface{}) (ParsedData, error)
     }
 
-    DataQuery <|-- RESTQuery
-    DataQuery <|-- SOAPQuery
-    DataQuery <|-- GraphQLQuery
-    DataQuery <|-- SQLQuery
-    DataQuery <|-- GRPCQuery
-    DataQuery <|-- FileQuery
-
+    DataQuery <|.. RESTQuery : implements
+    DataQuery <|.. SOAPQuery : implements
+    DataQuery <|.. GraphQLQuery : implements
+    DataQuery <|.. SQLQuery : implements
+    DataQuery <|.. GRPCQuery : implements
+    DataQuery <|.. FileQuery : implements
 ```
 
 ## Configuration
