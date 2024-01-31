@@ -93,6 +93,11 @@ targets:
     query: "query { ... }"
     // ... other GraphQL-specific configs ...
 
+  - type: "gRPC"
+    server_address: "localhost:50051"
+    method: "GetUser"
+    // ... other gRPC-specific configs ...
+
   - type: "SQL"
     connection_string: "user:password@tcp(localhost:3306)/database"
     query: "SELECT * FROM users"
