@@ -68,40 +68,58 @@ Example:
 ```yaml
 targets:
   - type: "REST"
-    url: "http://example.com/api/user"
-    method: "GET"
-    headers:
-      Accept: "application/json"
+    url: ""
+    method: ""
+    headers: {}
     response_type: "json"
-    parse_rules:
-      id: "userId"
-      name: "userName"
-    timeout: 5s
-    retry_count: 3
-    retry_interval: 1s
+    parse_rules: [{}]
+    timeout: ""
+    retry_count: 0
+    retry_interval: ""
 
   - type: "File"
-    file_path: "/path/to/local/file.json"
-    file_format: "json"
+    file_path: ""
+    file_format: ""
 
   - type: "SOAP"
-    endpoint: "http://example.com/soap"
-    // ... other SOAP-specific configs ...
+    endpoint: ""
+    body: ""
+    headers: {}
+    response_type: ""
+    parse_rules: [{}]
+    timeout: ""
+    retry_count: 0
+    retry_interval: ""
 
   - type: "GraphQL"
-    url: "http://example.com/graphql"
-    query: "query { ... }"
-    // ... other GraphQL-specific configs ...
+    url: ""
+    query: ""
+    variables: {}
+    headers: {}
+    response_type: ""
+    parse_rules: [{}]
+    timeout: ""
+    retry_count: 0
+    retry_interval: ""
 
   - type: "gRPC"
-    server_address: "localhost:50051"
-    method: "GetUser"
-    // ... other gRPC-specific configs ...
+    server_address: ""
+    method: ""
+    request: ""
+    response_type: ""
+    parse_rules: [{}]
+    timeout: ""
+    retry_count: 0
+    retry_interval: ""
 
   - type: "SQL"
-    connection_string: "user:password@tcp(localhost:3306)/database"
-    query: "SELECT * FROM users"
-    // ... other SQL-specific configs ...
+    connection_string: ""
+    query: ""
+    response_type: ""
+    parse_rules: [{}]
+    timeout: ""
+    retry_count: 0
+    retry_interval: ""
 ```
 
 Each target can have protocol-specific parameters such as URLs for REST, file paths for file-based scraping, and endpoints for SOAP. Additionally, common parameters like response type and parsing rules can be specified.
