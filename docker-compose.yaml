@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   orion:
     build:
@@ -8,7 +7,7 @@ services:
     container_name: orion
     image: orion:dev
     ports:
-      - "9981:9981"
+      - 9981:9981
     volumes:
       - $PWD/config:/config
     command: /usr/local/bin/orion run --config /config/config.yaml

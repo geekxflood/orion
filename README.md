@@ -20,32 +20,21 @@ Orion's design philosophy emphasizes extensibility and adaptability. It allows f
 - **Concurrent Execution**: Leverages Go's goroutines for concurrent query execution.
 - **Extensible**: Easily adaptable to include new data source types and target retrieval methods.
 
-## TODO
-
-- [ ] Add customizable modules for retrieving targets from various remote sources.
-- [x] Add a module for retrieving targets from a local file.
-- [ ] Enable remote cache usage (Redis, Memcached, etc.)
-- [ ] Use __meta_ labels to add more information to the targets and allow relabeling when serving the /targets.
-- [ ] Improve documentation for the new data querying capabilities.
-- [ ] Add tests for new modules.
-- [ ] Generate and publish OCI images.
-- [ ] Generate and publish a helm chart.
-
 ## Usage
 
 You can define a local configuration file or use the default one.
 
-\```bash
-orion run -config /path/to/config/file
-\```
+```bash
+orion run --config /path/to/config/file
+```
 
 **Docker**:
 
 Run Orion with Docker:
 
-\```bash
+```bash
 docker run -d -p 9981:9981 -v /path/to/config/file:/config.yaml ghcr.io/geekxflood/orion:latest /usr/local/bin/orion run --config /config.yaml
-\```
+```
 
 ![](assets/buildoci.gif)
 
@@ -57,14 +46,14 @@ The configuration file is a list of targets with settings for different data sou
 
 The configuration file supports an array of targets, each specifying the data source type and relevant settings.
 
-\```yaml
+```yaml
 targets:
   - type: "REST"
     url: "http://example.com/api"
     method: "GET"
     headers: {}
     response_type: "json"
-    parse_rules: {}
+    parser_rules: {}
     timeout: "30s"
     retry_count: 3
     retry_interval: "1s"
@@ -73,22 +62,11 @@ targets:
     file_path: "/path/to/local/file.json"
     file_format: "json"
 
-  - type: "SOAP"
-    endpoint: "http://example.com/soap"
-    body: "<SOAP request body>"
-    headers: {}
-    response_type: "xml"
-    parse_rules: {}
-    timeout: "30s"
-    retry_count: 3
-    retry_interval: "1s"
-    # ... other types like GraphQL, gRPC, SQL ...
-
 module: "module_name"
 port: "9981"
 insecure: false
 interval: "5s"
-\```
+```
 
 Each target can have protocol-specific parameters such as URLs for REST, file paths for file-based scraping, and endpoints for SOAP. Additionally, common parameters like response type and parsing rules can be specified.
 
@@ -96,7 +74,7 @@ Each target can have protocol-specific parameters such as URLs for REST, file pa
 
 The system determines the protocol for each target based on the configuration and handles the requests using the appropriate module.
 
-\```mermaid
+```mermaid
 flowchart LR
     A[Start] --> B[Read Configuration]
     B --> C{Determine Protocol}
@@ -114,7 +92,7 @@ flowchart LR
     I --> J
     J --> K[Aggregate Results]
     K --> L[End]
-\```
+```
 
 ## Endpoints
 
