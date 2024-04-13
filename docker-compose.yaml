@@ -11,3 +11,12 @@ services:
     volumes:
       - $PWD/config:/config
     command: /usr/local/bin/orion run --config /config/config.yaml
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - $PWD/example/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - $PWD/prometheus:/etc/prometheus
+    command: --config.file=/etc/prometheus/prometheus.yml

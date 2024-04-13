@@ -1,4 +1,5 @@
-// cmd/run.go
+// Package cmd cmd/run.go
+
 package cmd
 
 import (
@@ -30,6 +31,16 @@ var runCmd = &cobra.Command{
 	After that, it creates an HTTP client and passes the atomic.Value to it.
 	Finally, it selects the modules to run based on the configuration and runs the HTTP client.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if cfgFile == "" {
+			log.Println("No config file specified, using default config file in $HOME/.orion/config.yml")
+			homePath, err := helpers.GetHomePath()
+			if err != nil {
+				log.Fatalf("Error getting the home path: %s", err)
+			}
+			cfgFile = homePath + "/.orion/config.yml"
+		}
+
 		// Initialize the config
 		initialConf, err := helpers.ReadConfig(cfgFile)
 		if err != nil {

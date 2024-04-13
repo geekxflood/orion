@@ -79,3 +79,12 @@ func EncodeBase64(str string) string {
 	encoded := base64.StdEncoding.EncodeToString([]byte(str))
 	return encoded
 }
+
+// GetHomePath returns the home directory path.
+func GetHomePath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return home, nil
+}

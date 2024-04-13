@@ -1,20 +1,18 @@
 ---
-module: file
-port: "9981"
+module: module_name
+port: 9981
 insecure: false
-interval: "60"
-endpoints:
-  - targets:
-      - 10.0.10.2:9100
-      - 10.0.10.3:9100
-      - 10.0.10.4:9100
-      - 10.0.10.5:9100
-    labels:
-      __meta_datacenter: london
-      __meta_prometheus_job: node
-  - targets:
-      - 10.0.40.2:9100
-      - 10.0.40.3:9100
-    labels:
-      __meta_datacenter: london
-      __meta_prometheus_job: alertmanager
+interval: 5
+targets:
+  - type: REST
+    url: http://example.com/api
+    method: GET
+    headers: {}
+    response_type: json
+    parser_rules: {}
+    timeout: 30
+    retry_count: 3
+    retry_interval: 1
+  - type: File
+    file_path: /path/to/local/file.json
+    file_format: json
