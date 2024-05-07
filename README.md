@@ -112,8 +112,6 @@ interval: "5s"
 
 When defining a target, you can specify the module to use for querying the data source. 
 When default value are define for the module, the field become optional and a fallback to the default value.
-Each target can have protocol-specific parameters such as URLs for REST, file paths for file-based scraping,
-and endpoints for SOAP. Additionally, common parameters like response type and parsing rules can be specified.
 
 #### File
 
