@@ -3,7 +3,7 @@ module github.com/geekxflood/orion
 go 1.21
 
 require (
-	github.com/BurntSushi/toml v1.3.2
+	github.com/BurntSushi/toml v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/spf13/cobra v1.8.0
 	gopkg.in/yaml.v2 v2.4.0
