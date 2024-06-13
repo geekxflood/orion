@@ -65,7 +65,10 @@ func (client *Client) RunClient(endpoints []localtypes.Endpoints) {
 	})
 
 	// Start the HTTP server
-	r.Run(":" + currentConf.Port)
+	err := r.Run(":" + currentConf.Port)
+	if err != nil {
+		return
+	}
 
 	log.Println("Application available at http://localhost:" + currentConf.Port + "/")
 
