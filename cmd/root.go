@@ -14,13 +14,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "orion",
-	Short: "Orion is a tool for serving prometheus target configurations",
-	Long: `Orion is a tool for serving prometheus target configurations. 
-	It provides a simple and efficient way to manage and serve target configurations for Prometheus.
-	With Orion, you can easily update and distribute target configurations to multiple Prometheus instances.
-	For more information and usage examples, please visit the official Orion GitHub repository: https://github.com/geekxflood/orion.
-	Default port is 9981 and default config file is config.yml.`,
+	Use:     "orion",
+	Short:   "Prometheus target configuration server",
+	Long:    "Orion is a tool for serving prometheus target configurations.",
 	Version: "dev",
 }
 
