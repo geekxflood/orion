@@ -1,6 +1,6 @@
-<div style="display: flex; justify-content: center;">
-    <img style="width: 50%; height: auto;" src="assets/logo_nobg.png" alt="logo">
-</div>
+<h1 align="center" style="border-bottom: none">
+    <a href="https://github.com/geekxflood/orion" target="_blank"><img alt="Orion" src="assets/logo.png"></a>
+</h1>
 
 # Orion
 
@@ -12,14 +12,14 @@
   * [Project Description](#project-description)
   * [Key Features](#key-features)
   * [Endpoints](#endpoints)
+  * [Configuration](#configuration)
+    * [Module Configuration](#module-configuration)
   * [Usages](#usages)
     * [Initialize Configuration](#initialize-configuration)
     * [Start Orion](#start-orion)
-  * [Configuration](#configuration)
-    * [Configuration Structure](#configuration-structure)
-    * [Module Configuration](#module-configuration)
-      * [File](#file)
-      * [REST](#rest)
+      * [CLI](#cli)
+      * [Docker](#docker)
+* [License](#license)
 <!-- TOC -->
 
 ## Project Description
@@ -53,6 +53,18 @@ in a variety of complex and evolving technological landscapes.
 - **/targets**: Returns a list of targets in JSON format compliant with Prometheus `http_sd_configs`.
 - **/config**: Returns the configuration file in JSON format.
 
+## Configuration
+
+The configuration is design in a modular fashion, where you can define the data source and the target configuration.
+
+### Module Configuration
+
+When defining a target, you can specify the module to use for querying the data source. 
+When default value are define for the module, the field become optional and a fallback to the default value.
+
+- [File](doc/file.md)
+- [REST](doc/rest.md)
+
 ## Usages
 
 You can define a local configuration file or use the default one.
@@ -67,11 +79,15 @@ orion init
 
 ### Start Orion
 
+#### CLI
+
+Run Orion through the CLI:
+
 ```bash
 orion run --config /path/to/config/file
 ```
 
-**Docker**:
+#### Docker
 
 Run Orion with Docker:
 
@@ -79,40 +95,6 @@ Run Orion with Docker:
 docker run -d -p 9981:9981 -v /path/to/config/file:/config.yaml ghcr.io/geekxflood/orion:latest /usr/local/bin/orion run --config /config.yaml
 ```
 
-## Configuration
+# License
 
-The configuration file is a list of targets with settings for different data sources and protocols.
-
-### Configuration Structure
-
-The configuration file supports an array of targets, each specifying the data source type and relevant settings.
-
-```yaml
-targets:
-  - type: "REST"
-    url: "https://example.com/api"
-    method: "GET"
-    headers: { }
-    response_type: "json"
-    parser_rules: { }
-    timeout: "30s"
-    retry_count: 3
-    retry_interval: "1s"
-
-  - type: "File"
-    file_path: "/path/to/local/file.json"
-    file_format: "json"
-
-module: "module_name"
-port: "9981"
-insecure: false
-interval: "5s"
-```
-
-### Module Configuration
-
-When defining a target, you can specify the module to use for querying the data source. 
-When default value are define for the module, the field become optional and a fallback to the default value.
-
-- [File](doc/file.md)
-- [REST](doc/rest.md)
+GNU GENERAL PUBLIC LICENSE v2.0 - [LICENSE](LICENSE)
