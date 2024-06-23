@@ -1,18 +1,16 @@
 ---
-module: module_name
 port: 9981
 insecure: false
 interval: 5
 targets:
-  - type: REST
+  - type: rest
     url: http://example.com/api
     method: GET
     headers: {}
-    response_type: json
     parser_rules: {}
     timeout: 30
     retry_count: 3
     retry_interval: 1
-  - type: File
+  - type: file
     file_path: /path/to/local/file.json
     file_format: json

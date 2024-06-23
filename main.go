@@ -7,6 +7,5 @@ import (
 )
 
 func main() {
-	// Execute the command
 	cmd.Execute()
 }
