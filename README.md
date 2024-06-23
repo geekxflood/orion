@@ -7,19 +7,19 @@
 ## Table of Contents
 
 <!-- TOC -->
-* [Orion](#orion)
-  * [Table of Contents](#table-of-contents)
-  * [Project Description](#project-description)
-  * [Key Features](#key-features)
-  * [Endpoints](#endpoints)
-  * [Configuration](#configuration)
-    * [Module Configuration](#module-configuration)
-  * [Usages](#usages)
-    * [Initialize Configuration](#initialize-configuration)
-    * [Start Orion](#start-orion)
-      * [CLI](#cli)
-      * [Docker](#docker)
-* [License](#license)
+- [Orion](#orion)
+  - [Table of Contents](#table-of-contents)
+  - [Project Description](#project-description)
+  - [Key Features](#key-features)
+  - [Endpoints](#endpoints)
+  - [Configuration](#configuration)
+    - [Module Configuration](#module-configuration)
+  - [Usages](#usages)
+    - [Initialize Configuration](#initialize-configuration)
+    - [Start Orion](#start-orion)
+      - [CLI](#cli)
+      - [Docker](#docker)
+- [License](#license)
 <!-- TOC -->
 
 ## Project Description
@@ -43,10 +43,7 @@ in a variety of complex and evolving technological landscapes.
 ## Key Features
 
 - **Modular Design**: Separate modules for each data source type (REST, SOAP, GraphQL, ...) and Prometheus target retrieval.
-- **Common Interface**: A consistent interface across all modules for initialization, request handling, and response parsing.
 - **Configurable**: Uses YAML, JSON, or TOML configuration files for defining query parameters and target settings.
-- **Concurrent Execution**: Leverages Go's goroutines for concurrent query execution.
-- **Extensible**: Easily adaptable to accommodate new data sources.
 
 ## Endpoints
 
