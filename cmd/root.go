@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	cfgFile  string
-	insecure bool
-	port     string
+	cfgFilePath string
+	insecure    bool
+	port        string
 )
 
 var rootCmd = &cobra.Command{
@@ -29,7 +29,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.orion/config.yml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFilePath, "config", "c", "", "config file (default is $HOME/.orion/config.yml)")
 	rootCmd.PersistentFlags().BoolVarP(&insecure, "insecure", "i", false, "disable TLS verification")
 	rootCmd.PersistentFlags().StringVarP(&port, "port", "p", "9981", "port to listen on")
 }

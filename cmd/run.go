@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/geekxflood/orion/internal/helpers"
-	"github.com/geekxflood/orion/internal/httpclient"
-	"github.com/geekxflood/orion/internal/localtypes"
 	"github.com/spf13/cobra"
 )
 
@@ -26,28 +24,34 @@ var runCmd = &cobra.Command{
 	Long: `The run command starts the application and runs the selected modules.
 	It initializes the configuration, sets the port and insecure options, and runs the HTTP client.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if cfgFile == "" {
+		// If the configuration path file is not specified, use the default one
+		if cfgFilePath == "" {
 			log.Println("No config file specified, using default config file in $HOME/.orion/config.yml")
 			homePath, err := helpers.GetHomePath()
 			if err != nil {
 				log.Fatalf("Error getting the home path: %s", err)
 			}
-			cfgFile = homePath + "/.orion/config.yml"
+			cfgFilePath = homePath + "/.orion/config.yml"
 		}
 
-		initialConf, err := helpers.ReadConfig(cfgFile)
+		// Read the initial configuration
+		initialConf, err := helpers.ReadConfig(cfgFilePath)
 		if err != nil {
 			log.Fatalf("Error reading config file: %s", err)
 		}
+
+		// Override the configuration with the provided flags values
 		initialConf.Port = port
 		initialConf.Insecure = insecure
 
+		// Store the configuration
 		conf.Store(&initialConf)
 
+		// Refresh the configuration at the specified interval
 		go func() {
 			for {
 				time.Sleep(time.Duration(interval) * time.Second)
-				newConf, err := helpers.ReadConfig(cfgFile)
+				newConf, err := helpers.ReadConfig(cfgFilePath)
 				if err != nil {
 					log.Printf("Error refreshing config: %s", err)
 					continue
@@ -57,21 +61,16 @@ var runCmd = &cobra.Command{
 			}
 		}()
 
-		httpClient := httpclient.Client{Conf: &conf}
-
-		switch initialConf.Modules {
-		case "file":
-			log.Println("File module is enabled")
-			if initialConf.Endpoints == nil {
-				initialConf.Endpoints = []localtypes.Endpoints{}
+		// For each type of module run there respective client in a goroutine
+		for _, module := range initialConf.Modules {
+			switch module.Type {
+			case "rest":
+				go helpers.RunRESTClient(&module)
+			case "file":
+				go helpers.RunFileClient(&module)
+			default:
+				log.Fatalf("Unknown endpoint type: %s", module.Type)
 			}
-			httpClient.RunClient(initialConf.Endpoints)
-
-		case "http":
-			log.Println("HTTP module is enabled")
-
-		default:
-			log.Fatalln("No modules defined")
 		}
 	},
 }

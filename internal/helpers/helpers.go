@@ -12,6 +12,16 @@ import (
 	"github.com/geekxflood/orion/internal/unmarshaller"
 )
 
+// RunRESTClient runs the REST client with the provided endpoint.
+
+func RunRESTClient(*localtypes.Module) {
+	// Placeholder function for running REST client
+}
+
+func RunFileClient(*localtypes.Module) {
+	// Placeholder function for running file client
+}
+
 // ReadConfig reads a config file and returns a Config struct.
 // It looks for the config file in the current directory and unmarshals it into a Config struct.
 // If the config file is specified, it checks if the file exists and determines its format based on the file extension.

@@ -2,14 +2,14 @@ package localtypes
 
 // Config represents the configuration for the application.
 type Config struct {
-	Port      string     `yaml:"port" json:"port" toml:"port"`                // Port represents the port number.
-	Insecure  bool       `yaml:"insecure" json:"insecure" toml:"insecure"`    // Insecure indicates whether the connection is secure or not.
-	Interval  string     `yaml:"interval" json:"interval" toml:"interval"`    // Interval represents the time interval.
-	Endpoints []Endpoint `yaml:"endpoints" json:"endpoints" toml:"endpoints"` // Endpoints represents the list of endpoints.
+	Port     string   `yaml:"port" json:"port" toml:"port"`             // Port represents the port number.
+	Insecure bool     `yaml:"insecure" json:"insecure" toml:"insecure"` // Insecure indicates whether the connection is secure or not.
+	Interval string   `yaml:"interval" json:"interval" toml:"interval"` // Interval represents the time interval.
+	Modules  []Module `yaml:"modules" json:"modules" toml:"modules"`    // Endpoints represents the list of endpoints.
 }
 
 // Endpoint represents the endpoints structure.
-type Endpoint struct {
+type Module struct {
 	Type          string            `yaml:"type" json:"type" toml:"type"`                                                             // Type represents the type of endpoint (e.g., rest, file).
 	URL           string            `yaml:"url,omitempty" json:"url,omitempty" toml:"url,omitempty"`                                  // URL represents the URL for rest endpoints.
 	Method        string            `yaml:"method,omitempty" json:"method,omitempty" toml:"method,omitempty"`                         // Method represents the HTTP method for rest endpoints.
