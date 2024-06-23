@@ -17,7 +17,6 @@
 - [ ] configuration
   - [ ] `YAML`
   - [ ] `JSON`
-- [ ] docker image
 
 ## v1.1
 
