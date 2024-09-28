@@ -4,6 +4,11 @@
 
 # Orion
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/golang-standards/project-layout?style=flat-square)](https://goreportcard.com/report/github.com/geekxflood/orion)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/github.com/geekxflood/orion)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/golang-standards/project-layout)](https://pkg.go.dev/github.com/github.com/geekxflood/orion)
+[![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/github.com/geekxflood/orion/releases/latest)
+
 ## Table of Contents
 
 <!-- TOC -->
