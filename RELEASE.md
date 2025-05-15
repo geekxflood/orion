@@ -13,7 +13,7 @@
 
 - [ ] `file` module
 - [ ] `REST` module
-  - no refresh mecanism
+  - no refresh mechanism
 - [ ] configuration
   - [ ] `YAML`
   - [ ] `JSON`
@@ -21,7 +21,7 @@
 ## v1.1
 
 - [ ] `REST` module
-  - [ ] refresh mecanism
+  - [ ] refresh mechanism
 - [ ] documentation
   - focus on practical example
 

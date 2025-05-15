@@ -63,8 +63,8 @@ The configuration is design in a modular fashion, where you can define the data 
 When defining a target, you can specify the module to use for querying the data source. 
 When default value are define for the module, the field become optional and a fallback to the default value.
 
-- [File](doc/file.md)
-- [REST](doc/rest.md)
+- [File](docs/file.md)
+- [REST](docs/rest.md)
 
 ## Usages
 
